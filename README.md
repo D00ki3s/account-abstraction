@@ -25,3 +25,7 @@ https://github.com/D00ki3s/account-abstraction/blob/main/wallet/src/pages/Popup/
 ### Creating custome userOp with Dookies
 
 https://github.com/D00ki3s/account-abstraction/blob/main/wallet/src/pages/Background/redux-slices/transactions.ts#L174
+
+### Contracts
+
+We are currently using Simple Account and verifying the Paymaster from [Infinitism Account Abstraction contract package](https://github.com/eth-infinitism/account-abstraction)

@@ -1,11 +1,4 @@
-import {
-  Box,
-  Button,
-  Container,
-  Paper,
-  Stack,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Container, Paper, Stack, Typography } from '@mui/material';
 import React from 'react';
 import AccountInfo from '../account-info';
 import OriginInfo from '../origin-info';
@@ -25,10 +18,7 @@ const SignConfirmation = ({
           Sginature Request
         </Typography>
       </Box>
-      <AccountInfo
-        activeAccount={activeAccount || ''}
-        accountInfo={accountInfo}
-      />
+      <AccountInfo activeAccount={activeAccount || ''} accountInfo={accountInfo} />
       <Stack spacing={2} sx={{ position: 'relative', pt: 2, mb: 4 }}>
         <OriginInfo permission={originPermission} />
         <Paper sx={{ p: 2 }}>
@@ -55,12 +45,7 @@ const SignConfirmation = ({
           width: '100%',
         }}
       >
-        <Box
-          justifyContent="space-around"
-          alignItems="center"
-          display="flex"
-          sx={{ p: 2 }}
-        >
+        <Box justifyContent="space-around" alignItems="center" display="flex" sx={{ p: 2 }}>
           <Button sx={{ width: 150 }} variant="outlined" onClick={onCancel}>
             Cancel
           </Button>

@@ -23,7 +23,7 @@ import { EthersTransactionRequest } from '../../../Background/services/types';
 import AccountInfo from '../../components/account-info';
 import OriginInfo from '../../components/origin-info';
 import Config from '../../../../exconfig';
-
+import ad from '../../../../assets/img/ad.png';
 const SignTransactionComponent = AccountImplementations[ActiveAccountImplementation].Transaction;
 
 const SignTransactionConfirmation = ({
@@ -86,7 +86,13 @@ const SignTransactionConfirmation = ({
         {showAddPaymasterUI && (
           <Paper sx={{ p: 2 }}>
             <Grid container justifyContent="center">
-              <img src="https://via.placeholder.com/300" />
+              {/* replace with ad from ad engine */}
+              <a href="https://uniswap.org/" target="_blank" rel="noreferrer">
+                <img src={ad} height={300} width={300} style={{ objectFit: 'contain' }} />
+              </a>
+              <Typography variant="body2" sx={{ fontSize: '0.8em', color: 'blue' }}>
+                Ad from Dookie verified ad publisher
+              </Typography>
             </Grid>
           </Paper>
         )}

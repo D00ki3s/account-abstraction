@@ -14,7 +14,7 @@
 
 ## How It Was Built
 
-The development of the Dookie's Wallet began with the Trampoline Wallet as our foundation.
+The development of the Dookie's Wallet began with the [Trampoline Wallet](https://github.com/eth-infinitism/trampoline) as our foundation.
 
 The primary modifications we made revolved around the 'Create User Operation' process, which we restructured to include verification through Dookie's Paymaster.
 

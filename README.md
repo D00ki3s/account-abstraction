@@ -38,7 +38,7 @@ https://mumbai.polygonscan.com/address/0x88c90fc6cf63ecfe0070ddc710a30a07547d62c
 
 ### Tx
 
-This is a working tx reference on Polygon Mumbai
+This is a working tx reference on Polygon Mumbai.
 
 https://mumbai.polygonscan.com/tx/0x99d182888112e32c196513816774975818617234ba5843599158303a14df652e#eventlog
 

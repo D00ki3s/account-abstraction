@@ -2,10 +2,10 @@ import { UserOperationStruct } from '@account-abstraction/contracts';
 import { createSlice } from '@reduxjs/toolkit';
 import { RootState } from '.';
 import KeyringService from '../services/keyring';
-import ProviderBridgeService, {
-  EthersTransactionRequest,
-} from '../services/provider-bridge';
+import ProviderBridgeService, { EthersTransactionRequest } from '../services/provider-bridge';
 import { createBackgroundAsyncThunk } from './utils';
+
+import ethers from 'ethers';
 
 export type TransactionState = {
   transactionRequest?: EthersTransactionRequest;
@@ -55,10 +55,7 @@ type SigningReducers = {
       payload: EthersTransactionRequest[];
     }
   ) => TransactionState;
-  sendUserOperationRquest: (
-    state: TransactionState,
-    { payload }: { payload: UserOperationStruct }
-  ) => TransactionState;
+  sendUserOperationRquest: (state: TransactionState, { payload }: { payload: UserOperationStruct }) => TransactionState;
   setUnsignedUserOperation: (
     state: TransactionState,
     { payload }: { payload: UserOperationStruct }
@@ -66,11 +63,7 @@ type SigningReducers = {
   clearTransactionState: (state: TransactionState) => TransactionState;
 };
 
-const transactionsSlice = createSlice<
-  TransactionState,
-  SigningReducers,
-  'signing'
->({
+const transactionsSlice = createSlice<TransactionState, SigningReducers, 'signing'>({
   name: 'signing',
   initialState,
   reducers: {
@@ -119,17 +112,11 @@ const transactionsSlice = createSlice<
       ...state,
       modifiedTransactionsRequest: payload,
     }),
-    sendUserOperationRquest: (
-      state,
-      { payload }: { payload: UserOperationStruct }
-    ) => ({
+    sendUserOperationRquest: (state, { payload }: { payload: UserOperationStruct }) => ({
       ...state,
       userOperationRequest: payload,
     }),
-    setUnsignedUserOperation: (
-      state,
-      { payload }: { payload: UserOperationStruct }
-    ) => ({
+    setUnsignedUserOperation: (state, { payload }: { payload: UserOperationStruct }) => ({
       ...state,
       unsignedUserOperation: payload,
     }),
@@ -160,31 +147,21 @@ export default transactionsSlice.reducer;
 
 export const sendTransaction = createBackgroundAsyncThunk(
   'transactions/sendTransaction',
-  async (
-    { address, context }: { address: string; context?: any },
-    { dispatch, extra: { mainServiceManager } }
-  ) => {
-    const keyringService = mainServiceManager.getService(
-      KeyringService.name
-    ) as KeyringService;
+  async ({ address, context }: { address: string; context?: any }, { dispatch, extra: { mainServiceManager } }) => {
+    const keyringService = mainServiceManager.getService(KeyringService.name) as KeyringService;
 
     const state = mainServiceManager.store.getState() as RootState;
     const unsignedUserOp = state.transactions.unsignedUserOperation;
     const origin = state.transactions.requestOrigin;
 
     if (unsignedUserOp) {
-      const signedUserOp = await keyringService.signUserOpWithContext(
-        address,
-        unsignedUserOp,
-        context
-      );
+      const signedUserOp = await keyringService.signUserOpWithContext(address, unsignedUserOp, context);
+      console.log('unsignedUserOp', unsignedUserOp);
       const txnHash = keyringService.sendUserOp(address, signedUserOp);
 
       dispatch(clearTransactionState());
 
-      const providerBridgeService = mainServiceManager.getService(
-        ProviderBridgeService.name
-      ) as ProviderBridgeService;
+      const providerBridgeService = mainServiceManager.getService(ProviderBridgeService.name) as ProviderBridgeService;
 
       providerBridgeService.resolveRequest(origin || '', txnHash);
     }
@@ -194,18 +171,13 @@ export const sendTransaction = createBackgroundAsyncThunk(
 export const createUnsignedUserOp = createBackgroundAsyncThunk(
   'transactions/createUnsignedUserOp',
   async (address: string, { dispatch, extra: { mainServiceManager } }) => {
-    const keyringService = mainServiceManager.getService(
-      KeyringService.name
-    ) as KeyringService;
+    const keyringService = mainServiceManager.getService(KeyringService.name) as KeyringService;
 
     const state = mainServiceManager.store.getState() as RootState;
     const transactionRequest = state.transactions.transactionRequest;
 
     if (transactionRequest) {
-      const userOp = await keyringService.createUnsignedUserOp(
-        address,
-        transactionRequest
-      );
+      const userOp = await keyringService.createUnsignedUserOp(address, transactionRequest);
       dispatch(setUnsignedUserOperation(userOp));
     }
   }
@@ -216,12 +188,9 @@ export const rejectTransaction = createBackgroundAsyncThunk(
   async (address: string, { dispatch, extra: { mainServiceManager } }) => {
     dispatch(clearTransactionState());
 
-    const requestOrigin = (mainServiceManager.store.getState() as RootState)
-      .transactions.requestOrigin;
+    const requestOrigin = (mainServiceManager.store.getState() as RootState).transactions.requestOrigin;
 
-    const providerBridgeService = mainServiceManager.getService(
-      ProviderBridgeService.name
-    ) as ProviderBridgeService;
+    const providerBridgeService = mainServiceManager.getService(ProviderBridgeService.name) as ProviderBridgeService;
 
     providerBridgeService.rejectRequest(requestOrigin || '', '');
   }

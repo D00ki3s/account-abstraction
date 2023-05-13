@@ -9,7 +9,7 @@ import { ethers } from 'hardhat';
 async function main() {
   const [signer] = await ethers.getSigners();
   signer.sendTransaction({
-    to: '0x0A77cEdFB8459084aB81CF6786EadDaCf7974146',
+    to: '0x61eaC84b04eBd40a5B8335a1e16Ae4FAAa23eB9e',
     value: ethers.utils.parseEther('1'),
   });
 }

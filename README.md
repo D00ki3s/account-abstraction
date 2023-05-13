@@ -32,4 +32,4 @@ https://github.com/D00ki3s/account-abstraction/blob/main/wallet/src/pages/Backgr
 
 We are currently using Simple Account and verifying the Paymaster from [Infinitism Account Abstraction contract package](https://github.com/eth-infinitism/account-abstraction)
 
-Contracts have been deployed on the Polygon Mumbai network and the Gnosis Testnet.
+Contracts have been deployed on the Polygon Mumbai network.

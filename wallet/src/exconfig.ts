@@ -39,7 +39,7 @@ export default {
       symbol: 'MATIC',
       name: 'MATIC',
       decimals: 18,
-      image: 'https://ethereum.org/static/6b935ac0e6194247347855dc3d328e83/6ed5f/eth-diamond-black.webp',
+      image: 'https://cryptologos.cc/logos/polygon-matic-logo.png',
     },
   },
 };

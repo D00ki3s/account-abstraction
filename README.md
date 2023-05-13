@@ -16,6 +16,8 @@
 
 The development of the Dookie's Wallet began with the [Trampoline Wallet](https://github.com/eth-infinitism/trampoline) as our foundation.
 
+We've opted for a customizable wallet over a basic SDK due to our need for a sophisticated gas sponsoring flow that maintains user privacy preferences.
+
 The primary modifications we made revolved around the 'Create User Operation' process, which we restructured to include verification through Dookie's Paymaster.
 
 ### Call create custome userOp with Dookies
@@ -29,3 +31,5 @@ https://github.com/D00ki3s/account-abstraction/blob/main/wallet/src/pages/Backgr
 ### Contracts
 
 We are currently using Simple Account and verifying the Paymaster from [Infinitism Account Abstraction contract package](https://github.com/eth-infinitism/account-abstraction)
+
+Contracts have been deployed on the Polygon Mumbai network and the Gnosis Testnet.

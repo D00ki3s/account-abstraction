@@ -1,7 +1,8 @@
 import { UserOperationStruct } from '@account-abstraction/contracts';
-import { Box, Button, CircularProgress, Container, Paper, Stack, TextField, Grid, Typography } from '@mui/material';
-import { BigNumber, ethers } from 'ethers';
-import React, { useCallback, useState } from 'react';
+import { resolveProperties } from 'ethers/lib/utils';
+import { Box, Button, Container, Paper, Stack, Grid, Typography } from '@mui/material';
+import { ethers } from 'ethers';
+import React, { useCallback, useState, useEffect } from 'react';
 import { AccountImplementations, ActiveAccountImplementation } from '../../../App/constants';
 import { useBackgroundDispatch, useBackgroundSelector } from '../../../App/hooks';
 import { getAccountInfo, getActiveAccount } from '../../../Background/redux-slices/selectors/accountSelectors';
@@ -13,6 +14,7 @@ import {
 } from '../../../Background/redux-slices/selectors/transactionsSelectors';
 import {
   createUnsignedUserOp,
+  createUserOpWithDookies,
   rejectTransaction,
   sendTransaction,
   setUnsignedUserOperation,
@@ -44,23 +46,12 @@ const SignTransactionConfirmation = ({
   onSend: any;
 }) => {
   const [showAddPaymasterUI, setShowAddPaymasterUI] = useState<boolean>(false);
-  const [addPaymasterLoader, setAddPaymasterLoader] = useState<boolean>(false);
-  const [paymasterError, setPaymasterError] = useState<string>('');
 
-  const [paymasterUrl, setPaymasterUrl] = useState<string>('');
   const backgroundDispatch = useBackgroundDispatch();
 
-  const addPaymaster = useCallback(async () => {
-    // create signature for paymaster
-    const paymasterAndData = '0xabc';
-
-    backgroundDispatch(
-      setUnsignedUserOperation({
-        ...userOp,
-        paymasterAndData,
-      })
-    );
-  }, [activeNetwork.chainID, backgroundDispatch, userOp]);
+  const callCreateUserOpWithDookies = useCallback(async () => {
+    backgroundDispatch(createUserOpWithDookies(activeAccount));
+  }, [backgroundDispatch, activeAccount]);
 
   return (
     <Container>
@@ -83,9 +74,7 @@ const SignTransactionConfirmation = ({
             <Button
               onClick={() => {
                 setShowAddPaymasterUI(true);
-
-                // delay
-                addPaymaster();
+                callCreateUserOpWithDookies();
               }}
               variant="text"
             >
@@ -189,6 +178,7 @@ const SignTransactionRequest = () => {
 
   const onComplete = useCallback(
     async (modifiedTransaction: EthersTransactionRequest, context?: any) => {
+      console.log('onComplete');
       if (activeAccount) {
         backgroundDispatch(createUnsignedUserOp(activeAccount));
         setContext(context);

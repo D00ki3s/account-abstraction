@@ -4,7 +4,7 @@ import { RootState } from '.';
 import KeyringService from '../services/keyring';
 import ProviderBridgeService, { EthersTransactionRequest } from '../services/provider-bridge';
 import { createBackgroundAsyncThunk } from './utils';
-
+import { resolveProperties } from 'ethers/lib/utils';
 import ethers from 'ethers';
 
 export type TransactionState = {
@@ -148,6 +148,7 @@ export default transactionsSlice.reducer;
 export const sendTransaction = createBackgroundAsyncThunk(
   'transactions/sendTransaction',
   async ({ address, context }: { address: string; context?: any }, { dispatch, extra: { mainServiceManager } }) => {
+    console.log('sendTransaction');
     const keyringService = mainServiceManager.getService(KeyringService.name) as KeyringService;
 
     const state = mainServiceManager.store.getState() as RootState;
@@ -155,8 +156,8 @@ export const sendTransaction = createBackgroundAsyncThunk(
     const origin = state.transactions.requestOrigin;
 
     if (unsignedUserOp) {
+      console.log('userOp', unsignedUserOp);
       const signedUserOp = await keyringService.signUserOpWithContext(address, unsignedUserOp, context);
-      console.log('unsignedUserOp', unsignedUserOp);
       const txnHash = keyringService.sendUserOp(address, signedUserOp);
 
       dispatch(clearTransactionState());
@@ -164,6 +165,57 @@ export const sendTransaction = createBackgroundAsyncThunk(
       const providerBridgeService = mainServiceManager.getService(ProviderBridgeService.name) as ProviderBridgeService;
 
       providerBridgeService.resolveRequest(origin || '', txnHash);
+    }
+  }
+);
+
+// creating user operation again with dookie paymaster info
+// I had to have this code here and create user op again to access key rings
+export const createUserOpWithDookies = createBackgroundAsyncThunk(
+  'transactions/createUserOpWithDookies',
+  async (address: string, { dispatch, extra: { mainServiceManager } }) => {
+    console.log('createUserOpWithDookies');
+    const keyringService = mainServiceManager.getService(KeyringService.name) as KeyringService;
+
+    const state = mainServiceManager.store.getState() as RootState;
+    const transactionRequest = state.transactions.transactionRequest;
+
+    if (transactionRequest) {
+      const userOp = await keyringService.createUnsignedUserOp(address, transactionRequest);
+
+      const { paymasterAndData: paymasterAndDataWithBlankPaymasterSignature } = await fetch(
+        'http://localhost:8001/prepare',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      ).then((data) => data.json());
+
+      const preSignedUserOp = await keyringService.signUserOpWithContext(address, {
+        ...userOp,
+        paymasterAndData: paymasterAndDataWithBlankPaymasterSignature,
+      });
+
+      console.log('preSignedUserOp', preSignedUserOp);
+
+      const { paymasterAndData: paymasterAndDataWithPaymasterSignature } = await fetch('http://localhost:8001/sign', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userOp: {
+            ...(await resolveProperties(preSignedUserOp)),
+          },
+        }),
+      }).then((data) => data.json());
+
+      const finalUserOp = { ...userOp, paymasterAndData: paymasterAndDataWithPaymasterSignature };
+      console.log('finalUserOp', finalUserOp);
+
+      dispatch(setUnsignedUserOperation(finalUserOp));
     }
   }
 );

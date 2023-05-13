@@ -4,6 +4,9 @@ import { ethers } from 'hardhat';
 import { DeterministicDeployer } from '@account-abstraction/sdk';
 import { SimpleAccountFactory__factory } from '@account-abstraction/contracts';
 
+// @note
+// we are using default simple account
+
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const epAddr = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789';
   const dep = new DeterministicDeployer(ethers.provider);

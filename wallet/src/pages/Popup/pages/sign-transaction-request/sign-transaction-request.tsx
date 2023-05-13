@@ -1,28 +1,10 @@
 import { UserOperationStruct } from '@account-abstraction/contracts';
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Container,
-  Paper,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Box, Button, CircularProgress, Container, Paper, Stack, TextField, Grid, Typography } from '@mui/material';
 import { BigNumber, ethers } from 'ethers';
 import React, { useCallback, useState } from 'react';
-import {
-  AccountImplementations,
-  ActiveAccountImplementation,
-} from '../../../App/constants';
-import {
-  useBackgroundDispatch,
-  useBackgroundSelector,
-} from '../../../App/hooks';
-import {
-  getAccountInfo,
-  getActiveAccount,
-} from '../../../Background/redux-slices/selectors/accountSelectors';
+import { AccountImplementations, ActiveAccountImplementation } from '../../../App/constants';
+import { useBackgroundDispatch, useBackgroundSelector } from '../../../App/hooks';
+import { getAccountInfo, getActiveAccount } from '../../../Background/redux-slices/selectors/accountSelectors';
 import { selectCurrentOriginPermission } from '../../../Background/redux-slices/selectors/dappPermissionSelectors';
 import { getActiveNetwork } from '../../../Background/redux-slices/selectors/networkSelectors';
 import {
@@ -40,8 +22,7 @@ import AccountInfo from '../../components/account-info';
 import OriginInfo from '../../components/origin-info';
 import Config from '../../../../exconfig';
 
-const SignTransactionComponent =
-  AccountImplementations[ActiveAccountImplementation].Transaction;
+const SignTransactionComponent = AccountImplementations[ActiveAccountImplementation].Transaction;
 
 const SignTransactionConfirmation = ({
   activeNetwork,
@@ -65,6 +46,7 @@ const SignTransactionConfirmation = ({
   const [showAddPaymasterUI, setShowAddPaymasterUI] = useState<boolean>(false);
   const [addPaymasterLoader, setAddPaymasterLoader] = useState<boolean>(false);
   const [paymasterError, setPaymasterError] = useState<string>('');
+
   const [paymasterUrl, setPaymasterUrl] = useState<string>('');
   const backgroundDispatch = useBackgroundDispatch();
 
@@ -77,10 +59,7 @@ const SignTransactionConfirmation = ({
         chainId: parseInt(activeNetwork.chainID),
       });
       try {
-        const paymasterResp = await paymasterRPC.send(
-          'eth_getPaymasterAndDataSize',
-          [userOp]
-        );
+        const paymasterResp = await paymasterRPC.send('eth_getPaymasterAndDataSize', [userOp]);
         backgroundDispatch(
           setUnsignedUserOperation({
             ...userOp,
@@ -103,73 +82,32 @@ const SignTransactionConfirmation = ({
           Send transaction request
         </Typography>
       </Box>
-      {activeAccount && (
-        <AccountInfo activeAccount={activeAccount} accountInfo={accountInfo} />
-      )}
+      {activeAccount && <AccountInfo activeAccount={activeAccount} accountInfo={accountInfo} />}
       <Stack spacing={2} sx={{ position: 'relative', pt: 2, mb: 4 }}>
         <OriginInfo permission={originPermission} />
         <Typography variant="h6" sx-={{ p: 2 }}>
-          Paymaster Info
+          Watch Dookies Ad
         </Typography>
         {!showAddPaymasterUI && (
           <Paper sx={{ p: 2 }}>
             <Typography variant="body2">
-              {userOp.paymasterAndData === '0x'
-                ? 'No paymaster has been used'
-                : ';'}
+              Personalized ads will be displayed based on privacy-preserved preferences with Dookies.
             </Typography>
-            <Button onClick={() => setShowAddPaymasterUI(true)} variant="text">
-              Add custom
+            <Button
+              onClick={() => {
+                setShowAddPaymasterUI(true);
+              }}
+              variant="text"
+            >
+              Watch
             </Button>
           </Paper>
         )}
         {showAddPaymasterUI && (
           <Paper sx={{ p: 2 }}>
-            <TextField
-              value={paymasterUrl}
-              onChange={(e) => setPaymasterUrl(e.target.value)}
-              sx={{ width: '100%' }}
-              label="Paymaster URL"
-              variant="standard"
-            />
-            {paymasterError}
-            <Box
-              justifyContent="space-around"
-              alignItems="center"
-              display="flex"
-              sx={{ p: '16px 0px' }}
-            >
-              <Button
-                sx={{ width: 150 }}
-                variant="outlined"
-                onClick={() => {
-                  setShowAddPaymasterUI(false);
-                  setAddPaymasterLoader(false);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                disabled={addPaymasterLoader}
-                sx={{ width: 150, position: 'relative' }}
-                variant="contained"
-                onClick={addPaymaster}
-              >
-                Add
-                {addPaymasterLoader && (
-                  <CircularProgress
-                    size={24}
-                    sx={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      marginTop: '-12px',
-                      marginLeft: '-12px',
-                    }}
-                  />
-                )}
-              </Button>
-            </Box>
+            <Grid container justifyContent="center">
+              <img src="https://via.placeholder.com/300" />
+            </Grid>
           </Paper>
         )}
         <Typography variant="h6" sx-={{ p: 2 }}>
@@ -193,70 +131,50 @@ const SignTransactionConfirmation = ({
               <Typography variant="subtitle2" sx={{ mb: 2 }}>
                 Value:{' '}
                 <Typography component="span" variant="body2">
-                  {transaction.value
-                    ? ethers.utils.formatEther(transaction.value)
-                    : 0}{' '}
-                  {activeNetwork.baseAsset.symbol}
+                  {transaction.value ? ethers.utils.formatEther(transaction.value) : 0} {activeNetwork.baseAsset.symbol}
                 </Typography>
               </Typography>
             </Paper>
           ))}
         </Stack>
       </Stack>
-      {!showAddPaymasterUI && (
-        <Paper
-          elevation={3}
-          sx={{
-            position: 'sticky',
-            bottom: 0,
-            left: 0,
-            width: '100%',
-          }}
-        >
-          <Box
-            justifyContent="space-around"
-            alignItems="center"
-            display="flex"
-            sx={{ p: 2 }}
-          >
-            <Button sx={{ width: 150 }} variant="outlined" onClick={onReject}>
-              Reject
-            </Button>
-            <Button
-              sx={{ width: 150 }}
-              variant="contained"
-              onClick={() => onSend()}
-            >
-              Send
-            </Button>
-          </Box>
-        </Paper>
-      )}
+      <Paper
+        elevation={3}
+        sx={{
+          position: 'sticky',
+          bottom: 0,
+          left: 0,
+          width: '100%',
+        }}
+      >
+        <Box justifyContent="space-around" alignItems="center" display="flex" sx={{ p: 2 }}>
+          <Button sx={{ width: 150 }} variant="outlined" onClick={onReject}>
+            Reject
+          </Button>
+          <Button sx={{ width: 150 }} variant="contained" onClick={() => onSend()}>
+            Send
+          </Button>
+        </Box>
+      </Paper>
     </Container>
   );
 };
 
 const SignTransactionRequest = () => {
-  const [stage, setStage] = useState<
-    'custom-account-screen' | 'sign-transaction-confirmation'
-  >('custom-account-screen');
+  const [stage, setStage] = useState<'custom-account-screen' | 'sign-transaction-confirmation'>(
+    'custom-account-screen'
+  );
 
   const [context, setContext] = useState(null);
 
   const backgroundDispatch = useBackgroundDispatch();
   const activeAccount = useBackgroundSelector(getActiveAccount);
   const activeNetwork = useBackgroundSelector(getActiveNetwork);
-  const accountInfo = useBackgroundSelector((state) =>
-    getAccountInfo(state, activeAccount)
-  );
+  const accountInfo = useBackgroundSelector((state) => getAccountInfo(state, activeAccount));
 
-  const sendTransactionRequest = useBackgroundSelector(
-    selectCurrentPendingSendTransactionRequest
-  );
+  const sendTransactionRequest = useBackgroundSelector(selectCurrentPendingSendTransactionRequest);
 
-  const pendingUserOp = useBackgroundSelector(
-    selectCurrentPendingSendTransactionUserOp
-  );
+  const pendingUserOp = useBackgroundSelector(selectCurrentPendingSendTransactionUserOp);
 
   const originPermission = useBackgroundSelector((state) =>
     selectCurrentOriginPermission(state, {
@@ -294,16 +212,11 @@ const SignTransactionRequest = () => {
   );
 
   const onReject = useCallback(async () => {
-    if (activeAccount)
-      await backgroundDispatch(rejectTransaction(activeAccount));
+    if (activeAccount) await backgroundDispatch(rejectTransaction(activeAccount));
     window.close();
   }, [backgroundDispatch, activeAccount]);
 
-  if (
-    stage === 'sign-transaction-confirmation' &&
-    pendingUserOp &&
-    sendTransactionRequest.transactionRequest
-  )
+  if (stage === 'sign-transaction-confirmation' && pendingUserOp && sendTransactionRequest.transactionRequest)
     return (
       <SignTransactionConfirmation
         activeNetwork={activeNetwork}
@@ -317,8 +230,7 @@ const SignTransactionRequest = () => {
       />
     );
 
-  return SignTransactionComponent &&
-    sendTransactionRequest.transactionRequest ? (
+  return SignTransactionComponent && sendTransactionRequest.transactionRequest ? (
     <SignTransactionComponent
       onReject={onReject}
       transaction={sendTransactionRequest.transactionRequest}

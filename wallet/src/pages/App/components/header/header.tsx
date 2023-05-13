@@ -1,19 +1,7 @@
-import {
-  Box,
-  Container,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Stack,
-  Typography,
-} from '@mui/material';
+import { Box, Container, FormControl, InputLabel, MenuItem, Select, Stack, Typography } from '@mui/material';
 import React from 'react';
-import logo from '../../../../assets/img/logo.svg';
-import {
-  getActiveNetwork,
-  getSupportedNetworks,
-} from '../../../Background/redux-slices/selectors/networkSelectors';
+import logo from '../../../../assets/img/dookies_logo.jpeg';
+import { getActiveNetwork, getSupportedNetworks } from '../../../Background/redux-slices/selectors/networkSelectors';
 import { useBackgroundSelector } from '../../hooks';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { useNavigate } from 'react-router-dom';
@@ -46,14 +34,9 @@ const Header = () => {
         sx={{ cursor: 'pointer' }}
         onClick={() => navigate('/')}
       >
-        <img height={30} src={logo} className="App-logo" alt="logo" />
+        <img height={64} src={logo} className="App-logo" alt="logo" />
       </Stack>
-      <Stack
-        direction="row"
-        spacing={2}
-        justifyContent="center"
-        alignItems="center"
-      >
+      <Stack direction="row" spacing={2} justifyContent="center" alignItems="center">
         <FormControl sx={{ minWidth: 80 }}>
           <InputLabel id="chain-selector">Chain</InputLabel>
           <Select

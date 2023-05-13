@@ -1,44 +1,26 @@
-import {
-  Button,
-  CardActions,
-  CardContent,
-  CircularProgress,
-  Stack,
-  Typography,
-} from '@mui/material';
+import { Button, CardActions, CardContent, CircularProgress, Stack, Typography, Box } from '@mui/material';
 import React from 'react';
-import { EthersTransactionRequest } from '../../../Background/services/provider-bridge';
 import { TransactionComponentProps } from '../types';
+import dookiesLogo from '../../../../assets/img/dookies_logo_2.jpeg';
 
-const Transaction = ({
-  transaction,
-  onComplete,
-  onReject,
-}: TransactionComponentProps) => {
+const Transaction = ({ transaction, onComplete, onReject }: TransactionComponentProps) => {
   const [loader, setLoader] = React.useState<boolean>(false);
 
   return (
     <>
       <CardContent>
         <Typography variant="h3" gutterBottom>
-          Dummy Account Component
+          How Dookies Wallet works
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          You can show as many steps as you want in this dummy component. You
-          need to call the function <b>onComplete</b> passed as a props to this
-          component. <br />
-          <br />
-          The function takes a modifiedTransactions & context as a parameter,
-          the context will be passed to your AccountApi when creating a new
-          account. While modifiedTransactions will be agreed upon by the user.
-          <br />
-          This Component is defined in exported in{' '}
-        </Typography>
-        <Typography variant="caption">
-          trampoline/src/pages/Account/components/transaction/index.ts
+          On the next screen, you will have the option to enable gas sponsoring by watching a privacy-preserving
+          personalized ad.
+          <Box display="flex" justifyContent="center" alignItems="center" sx={{ p: 2 }}>
+            <img height={250} src={dookiesLogo} className="App-logo" alt="logo" />
+          </Box>
         </Typography>
       </CardContent>
-      <CardActions sx={{ pl: 4, pr: 4, width: '100%' }}>
+      <CardActions sx={{ pl: 2, pr: 2, width: '100%' }}>
         <Stack spacing={2} sx={{ width: '100%' }}>
           <Button
             disabled={loader}

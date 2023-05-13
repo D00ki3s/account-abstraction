@@ -62,7 +62,6 @@ const SignTransactionConfirmation = ({
       </Box>
       {activeAccount && <AccountInfo activeAccount={activeAccount} accountInfo={accountInfo} />}
       <Stack spacing={2} sx={{ position: 'relative', pt: 2, mb: 4 }}>
-        <OriginInfo permission={originPermission} />
         <Typography variant="h6" sx-={{ p: 2 }}>
           Watch Dookies Ad
         </Typography>
@@ -71,15 +70,17 @@ const SignTransactionConfirmation = ({
             <Typography variant="body2">
               Personalized ads will be displayed based on privacy-preserved preferences with Dookies.
             </Typography>
-            <Button
-              onClick={() => {
-                setShowAddPaymasterUI(true);
-                callCreateUserOpWithDookies();
-              }}
-              variant="text"
-            >
-              Watch
-            </Button>
+            <Box display="flex" justifyContent="center" alignItems="center" sx={{ pt: 2 }}>
+              <Button
+                onClick={() => {
+                  setShowAddPaymasterUI(true);
+                  callCreateUserOpWithDookies();
+                }}
+                variant="text"
+              >
+                Watch
+              </Button>
+            </Box>
           </Paper>
         )}
         {showAddPaymasterUI && (
@@ -89,6 +90,7 @@ const SignTransactionConfirmation = ({
             </Grid>
           </Paper>
         )}
+        {/* <OriginInfo permission={originPermission} /> */}
         <Typography variant="h6" sx-={{ p: 2 }}>
           {transactions.length > 1 ? ' Transactions data' : 'Transaction data'}
         </Typography>

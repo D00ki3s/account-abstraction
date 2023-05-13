@@ -12,6 +12,7 @@ const paymasterAddress = "0x88c90fc6cf63ecfe0070ddc710a30a07547d62cc";
 
 // todo: should use better way to manage signer key
 const privateKey = process.env.PRIVATE_KEY || "";
+const rpc = process.env.RPC || "http://127.0.0.1:8545";
 const port = process.env.PORT || "8001";
 
 const app: Express = express();
@@ -52,17 +53,11 @@ app.post("/sign", async (req: Request, res: Response) => {
     res.status(500).send("ad validation is failed");
   }
 
-  // todo: should make it dynamic
-  const provider = new ethers.providers.JsonRpcProvider("http://127.0.0.1:8545");
+  const provider = new ethers.providers.JsonRpcProvider(rpc);
   const paymasterContract = new ethers.Contract(paymasterAddress, DookiesPaymasterJson.abi, provider);
 
   const { validUntil, validAfter } = await paymasterContract.parsePaymasterAndData(userOp.paymasterAndData);
-  console.log("userOp", userOp);
-  console.log("validUntil", validUntil);
-  console.log("validAfter", validAfter);
   const hash = await paymasterContract.getHash(userOp, validUntil, validAfter);
-  console.log("hash", hash);
-
   const signer = new ethers.Wallet(privateKey, provider);
   const signature = await signer.signMessage(ethers.utils.arrayify(hash));
   const validity = ethers.utils.defaultAbiCoder.encode(["uint48", "uint48"], [validUntil, validAfter]);

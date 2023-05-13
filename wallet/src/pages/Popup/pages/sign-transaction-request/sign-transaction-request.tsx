@@ -23,7 +23,9 @@ import { EthersTransactionRequest } from '../../../Background/services/types';
 import AccountInfo from '../../components/account-info';
 import OriginInfo from '../../components/origin-info';
 import Config from '../../../../exconfig';
-import ad from '../../../../assets/img/ad.png';
+import ad from '../../../../assets/img/ad.gif';
+import CircularProgress from '@mui/material/CircularProgress';
+
 const SignTransactionComponent = AccountImplementations[ActiveAccountImplementation].Transaction;
 
 const SignTransactionConfirmation = ({
@@ -45,13 +47,25 @@ const SignTransactionConfirmation = ({
   onReject: any;
   onSend: any;
 }) => {
-  const [showAddPaymasterUI, setShowAddPaymasterUI] = useState<boolean>(false);
+  const [showAddPaymasterUI, setShowAddPaymasterUI] = useState<boolean>(true);
+  const [loading, setLoading] = useState(false);
 
   const backgroundDispatch = useBackgroundDispatch();
 
+  function wait(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
   const callCreateUserOpWithDookies = useCallback(async () => {
+    setLoading(true);
     backgroundDispatch(createUserOpWithDookies(activeAccount));
+    await wait(5000);
+    setLoading(false);
   }, [backgroundDispatch, activeAccount]);
+
+  useEffect(() => {
+    callCreateUserOpWithDookies();
+  }, []);
 
   return (
     <Container>
@@ -74,7 +88,6 @@ const SignTransactionConfirmation = ({
               <Button
                 onClick={() => {
                   setShowAddPaymasterUI(true);
-                  callCreateUserOpWithDookies();
                 }}
                 variant="text"
               >
@@ -138,8 +151,13 @@ const SignTransactionConfirmation = ({
           <Button sx={{ width: 150 }} variant="outlined" onClick={onReject}>
             Reject
           </Button>
-          <Button sx={{ width: 150 }} variant="contained" onClick={() => onSend()}>
-            Send
+          <Button
+            sx={{ width: 150 }}
+            variant="contained"
+            onClick={() => onSend()}
+            disabled={showAddPaymasterUI && loading}
+          >
+            {loading ? <CircularProgress size={20} /> : 'Send'}
           </Button>
         </Box>
       </Paper>

@@ -5,7 +5,8 @@ import KeyringService from '../services/keyring';
 import ProviderBridgeService, { EthersTransactionRequest } from '../services/provider-bridge';
 import { createBackgroundAsyncThunk } from './utils';
 import { resolveProperties } from 'ethers/lib/utils';
-import ethers from 'ethers';
+
+import config from '../../../exconfig';
 
 export type TransactionState = {
   transactionRequest?: EthersTransactionRequest;
@@ -23,6 +24,16 @@ export const initialState: TransactionState = {
   userOperationRequest: undefined,
   unsignedUserOperation: undefined,
 };
+
+// @note
+// gas calculation is not working well with local bundler and trampoline
+// so we hard-code gas calculation for temp fix to demo in hackathon
+
+// const preVerificationGas = calcPreVerificationGas(userOp);
+// const verificationGas = BigNumber.from(preOpGas).toNumber();
+const preVerificationGas = '0xf4240'; // 1000000
+const callGasLimit = '0xf4240'; // 1000000
+const baseURI = config.baseURI;
 
 type SigningReducers = {
   sendTransactionRequest: (
@@ -182,16 +193,15 @@ export const createUserOpWithDookies = createBackgroundAsyncThunk(
 
     if (transactionRequest) {
       const userOp = await keyringService.createUnsignedUserOp(address, transactionRequest);
+      userOp.preVerificationGas = preVerificationGas;
+      userOp.callGasLimit = callGasLimit;
 
-      const { paymasterAndData: paymasterAndDataWithBlankPaymasterSignature } = await fetch(
-        'http://localhost:8001/prepare',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      ).then((data) => data.json());
+      const { paymasterAndData: paymasterAndDataWithBlankPaymasterSignature } = await fetch(baseURI + 'prepare', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }).then((data) => data.json());
 
       const preSignedUserOp = await keyringService.signUserOpWithContext(address, {
         ...userOp,
@@ -200,7 +210,7 @@ export const createUserOpWithDookies = createBackgroundAsyncThunk(
 
       console.log('preSignedUserOp', preSignedUserOp);
 
-      const { paymasterAndData: paymasterAndDataWithPaymasterSignature } = await fetch('http://localhost:8001/sign', {
+      const { paymasterAndData: paymasterAndDataWithPaymasterSignature } = await fetch(baseURI + 'sign', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -212,7 +222,11 @@ export const createUserOpWithDookies = createBackgroundAsyncThunk(
         }),
       }).then((data) => data.json());
 
-      const finalUserOp = { ...userOp, paymasterAndData: paymasterAndDataWithPaymasterSignature };
+      const finalUserOp = {
+        ...preSignedUserOp,
+        paymasterAndData: paymasterAndDataWithPaymasterSignature,
+        signature: '',
+      };
       console.log('finalUserOp', finalUserOp);
 
       dispatch(setUnsignedUserOperation(finalUserOp));
@@ -230,7 +244,9 @@ export const createUnsignedUserOp = createBackgroundAsyncThunk(
 
     if (transactionRequest) {
       const userOp = await keyringService.createUnsignedUserOp(address, transactionRequest);
-      dispatch(setUnsignedUserOperation(userOp));
+      userOp.preVerificationGas = preVerificationGas;
+      userOp.callGasLimit = callGasLimit;
+      dispatch(setUnsignedUserOperation({ ...userOp }));
     }
   }
 );

@@ -6,10 +6,7 @@ import * as encryptor from '@metamask/browser-passworder';
 import { Provider } from '@ethersproject/providers';
 import { BigNumber, ethers } from 'ethers';
 import { AccountApiType } from '../../Account/account-api/types';
-import {
-  AccountImplementations,
-  ActiveAccountImplementation,
-} from '../constants';
+import { AccountImplementations, ActiveAccountImplementation } from '../constants';
 import { HttpRpcClient, PaymasterAPI } from '@account-abstraction/sdk';
 import { MessageSigningRequest } from '../redux-slices/signing';
 import { AccountData } from '../redux-slices/account';
@@ -70,20 +67,14 @@ export default class KeyringService extends BaseService<Events> {
         }
 
         if (bundlerRPC) {
-          const supportedEntryPoint = await bundlerRPC.send(
-            'eth_supportedEntryPoints',
-            []
-          );
+          const supportedEntryPoint = await bundlerRPC.send('eth_supportedEntryPoints', []);
           if (!supportedEntryPoint.includes(entryPointAddress)) {
-            throw new Error(
-              `Bundler network doesn't support entryPoint ${entryPointAddress}`
-            );
+            throw new Error(`Bundler network doesn't support entryPoint ${entryPointAddress}`);
           }
         }
 
         const code = await this.provider.getCode(entryPointAddress);
-        if (code === '0x')
-          throw new Error(`Entrypoint not deployed at ${entryPointAddress}`);
+        if (code === '0x') throw new Error(`Entrypoint not deployed at ${entryPointAddress}`);
 
         this.bundler = new HttpRpcClient(bundler, entryPointAddress, chainId);
       });
@@ -133,9 +124,7 @@ export default class KeyringService extends BaseService<Events> {
    * @param {object} serialized - The serialized keyring.
    * @returns {Promise<Keyring|undefined>} The deserialized keyring or undefined if the keyring type is unsupported.
    */
-  _restoreKeyring = async (
-    serialized: KeyringSerialisedState
-  ): Promise<AccountApiType | undefined> => {
+  _restoreKeyring = async (serialized: KeyringSerialisedState): Promise<AccountApiType | undefined> => {
     const { address, type, data } = serialized;
 
     const keyring = await this._newKeyring(address, type, data);
@@ -154,11 +143,7 @@ export default class KeyringService extends BaseService<Events> {
    * @param {object} data - The data to restore a previously serialized keyring.
    * @returns {Promise<Keyring>} The new keyring.
    */
-  async _newKeyring(
-    address: string,
-    type: string,
-    data: any
-  ): Promise<AccountApiType> {
+  async _newKeyring(address: string, type: string, data: any): Promise<AccountApiType> {
     const account = new AccountImplementations[type]({
       provider: this.provider,
       entryPointAddress: this.entryPointAddress,
@@ -200,17 +185,12 @@ export default class KeyringService extends BaseService<Events> {
 
   persistAllKeyrings = async () => {
     if (!this.password && !this.encryptionKey) {
-      throw new Error(
-        'Cannot persist vault without password and encryption key'
-      );
+      throw new Error('Cannot persist vault without password and encryption key');
     }
 
     const serializedKeyrings: KeyringSerialisedState[] = await Promise.all(
       Object.values(this.keyrings).map(async (keyring) => {
-        const [address, data] = await Promise.all([
-          await keyring.getAccountAddress(),
-          keyring.serialize(),
-        ]);
+        const [address, data] = await Promise.all([await keyring.getAccountAddress(), keyring.serialize()]);
         return { type: ActiveAccountImplementation, address, data };
       })
     );
@@ -218,8 +198,10 @@ export default class KeyringService extends BaseService<Events> {
     let vault: string;
 
     if (this.password) {
-      const { vault: newVault, exportedKeyString } =
-        await encryptor.encryptWithDetail(this.password, serializedKeyrings);
+      const { vault: newVault, exportedKeyString } = await encryptor.encryptWithDetail(
+        this.password,
+        serializedKeyrings
+      );
       vault = newVault;
       this.encryptionKey = exportedKeyString;
       this.encryptionSalt = JSON.parse(newVault).salt;
@@ -243,10 +225,7 @@ export default class KeyringService extends BaseService<Events> {
 
   createKeyringForImplementation = async (implementation: string) => {};
 
-  addAccount = async (
-    implementation: string,
-    context?: any
-  ): Promise<string> => {
+  addAccount = async (implementation: string, context?: any): Promise<string> => {
     const account = new AccountImplementations[implementation]({
       provider: this.provider,
       entryPointAddress: this.entryPointAddress,
@@ -299,9 +278,7 @@ export default class KeyringService extends BaseService<Events> {
     const keyring = this.keyrings[address];
 
     response.minimumRequiredFunds = ethers.utils.formatEther(
-      BigNumber.from(
-        await keyring.estimateCreationGas(await keyring.getInitCode())
-      )
+      BigNumber.from(await keyring.estimateCreationGas(await keyring.getInitCode()))
     );
 
     const balance = await this.provider.getBalance(address);
@@ -325,11 +302,7 @@ export default class KeyringService extends BaseService<Events> {
     return response;
   };
 
-  personalSign = async (
-    address: string,
-    context: any,
-    request?: MessageSigningRequest
-  ): Promise<string> => {
+  personalSign = async (address: string, context: any, request?: MessageSigningRequest): Promise<string> => {
     const keyring = this.keyrings[address];
 
     if (!keyring) throw new Error('No keyring for the address found');
@@ -337,11 +310,7 @@ export default class KeyringService extends BaseService<Events> {
     return keyring.signMessage(context, request);
   };
 
-  callAccountApi = async (
-    address: string,
-    functionName: string,
-    args?: any[]
-  ) => {
+  callAccountApi = async (address: string, functionName: string, args?: any[]) => {
     const keyring = this.keyrings[address];
 
     return args ? keyring[functionName](...args) : keyring[functionName]();
@@ -357,10 +326,7 @@ export default class KeyringService extends BaseService<Events> {
     return keyring.signUserOpWithContext(userOp, context);
   };
 
-  sendUserOp = async (
-    address: string,
-    userOp: UserOperationStruct
-  ): Promise<string | null> => {
+  sendUserOp = async (address: string, userOp: UserOperationStruct): Promise<string | null> => {
     if (this.bundler) {
       const userOpHash = await this.bundler.sendUserOpToBundler(userOp);
       const keyring = this.keyrings[address];
@@ -376,12 +342,8 @@ export default class KeyringService extends BaseService<Events> {
     const keyring = this.keyrings[address];
     const userOp = await keyring.createUnsignedUserOp({
       target: transaction.to,
-      data: transaction.data
-        ? ethers.utils.hexConcat([transaction.data])
-        : '0x',
-      value: transaction.value
-        ? ethers.BigNumber.from(transaction.value)
-        : undefined,
+      data: transaction.data ? ethers.utils.hexConcat([transaction.data]) : '0x',
+      value: transaction.value ? ethers.BigNumber.from(transaction.value) : undefined,
       gasLimit: transaction.gasLimit,
       maxFeePerGas: transaction.maxFeePerGas,
       maxPriorityFeePerGas: transaction.maxPriorityFeePerGas,
@@ -391,35 +353,31 @@ export default class KeyringService extends BaseService<Events> {
     userOp.nonce = ethers.BigNumber.from(await userOp.nonce).toHexString();
     userOp.initCode = await userOp.initCode;
     userOp.callData = await userOp.callData;
-    userOp.callGasLimit = ethers.BigNumber.from(
-      await userOp.callGasLimit
-    ).toHexString();
-    userOp.verificationGasLimit = ethers.BigNumber.from(
-      await userOp.verificationGasLimit
-    ).toHexString();
+    userOp.callGasLimit = ethers.BigNumber.from(await userOp.callGasLimit).toHexString();
+    userOp.verificationGasLimit = ethers.BigNumber.from(await userOp.verificationGasLimit).toHexString();
     userOp.preVerificationGas = await userOp.preVerificationGas;
-    userOp.maxFeePerGas = ethers.BigNumber.from(
-      await userOp.maxFeePerGas
-    ).toHexString();
-    userOp.maxPriorityFeePerGas = ethers.BigNumber.from(
-      await userOp.maxPriorityFeePerGas
-    ).toHexString();
+    userOp.maxFeePerGas = ethers.BigNumber.from(await userOp.maxFeePerGas).toHexString();
+    userOp.maxPriorityFeePerGas = ethers.BigNumber.from(await userOp.maxPriorityFeePerGas).toHexString();
     userOp.paymasterAndData = await userOp.paymasterAndData;
     userOp.signature = await userOp.signature;
 
-    const gasParameters = await this.bundler?.estimateUserOpGas(
-      await keyring.signUserOp(userOp)
-    );
+    const gasParameters = await this.bundler?.estimateUserOpGas(await keyring.signUserOp(userOp));
 
-    userOp.callGasLimit = ethers.BigNumber.from(
-      gasParameters?.callGasLimit || userOp.callGasLimit
-    ).toHexString();
-    userOp.verificationGasLimit = ethers.BigNumber.from(
-      gasParameters?.verificationGas || userOp.verificationGasLimit
-    ).toHexString();
-    userOp.preVerificationGas = ethers.BigNumber.from(
-      gasParameters?.preVerificationGas || userOp.preVerificationGas
-    ).toHexString();
+    const estimatedGasLimit = ethers.BigNumber.from(gasParameters?.callGasLimit);
+    const estimateVerificationGasLimit = ethers.BigNumber.from(gasParameters?.verificationGas);
+    const estimatePreVerificationGas = ethers.BigNumber.from(gasParameters?.preVerificationGas);
+
+    userOp.callGasLimit = estimatedGasLimit.gt(ethers.BigNumber.from(userOp.callGasLimit))
+      ? estimatedGasLimit.toHexString()
+      : userOp.callGasLimit;
+
+    userOp.verificationGasLimit = estimateVerificationGasLimit.gt(ethers.BigNumber.from(userOp.verificationGasLimit))
+      ? estimateVerificationGasLimit.toHexString()
+      : userOp.verificationGasLimit;
+
+    userOp.preVerificationGas = estimatePreVerificationGas.gt(ethers.BigNumber.from(userOp.preVerificationGas))
+      ? estimatePreVerificationGas.toHexString()
+      : userOp.preVerificationGas;
 
     return userOp;
   };
@@ -433,8 +391,7 @@ export default class KeyringService extends BaseService<Events> {
     bundler,
     entryPointAddress,
   }: KeyringServiceCreateProps): Promise<KeyringService> {
-    if (!mainServiceManager)
-      throw new Error('mainServiceManager is needed for Keyring Servie');
+    if (!mainServiceManager) throw new Error('mainServiceManager is needed for Keyring Servie');
 
     const keyringService = new KeyringService(
       mainServiceManager,
@@ -445,11 +402,7 @@ export default class KeyringService extends BaseService<Events> {
     );
 
     if (initialState?.encryptionKey && initialState?.encryptionSalt) {
-      await keyringService.unlockVault(
-        undefined,
-        initialState?.encryptionKey,
-        initialState?.encryptionSalt
-      );
+      await keyringService.unlockVault(undefined, initialState?.encryptionKey, initialState?.encryptionSalt);
     }
 
     return keyringService;

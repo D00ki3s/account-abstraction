@@ -152,14 +152,11 @@ export class UserOpMethodHandler {
       validAfter = undefined;
     }
 
-    // @note
-    // gas calculation is not working well with local bundler and trampoline
-    // so we hard-code gas calculation for temp fix to demo in hackathon
+    const preVerificationGas = calcPreVerificationGas(userOp);
+    const verificationGas = BigNumber.from(preOpGas).toNumber();
 
-    // const preVerificationGas = calcPreVerificationGas(userOp);
-    // const verificationGas = BigNumber.from(preOpGas).toNumber();
-    const preVerificationGas = "0xf4240"; // 1000000
-    const verificationGas = "0xf4240"; // 1000000
+    // const preVerificationGas = "0xf4240"; // 1000000
+    // const verificationGas = "0xf4240"; // 1000000
 
     return {
       preVerificationGas,

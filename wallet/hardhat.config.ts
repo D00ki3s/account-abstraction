@@ -3,15 +3,14 @@ import '@nomiclabs/hardhat-ethers';
 import 'hardhat-deploy';
 import '@typechain/hardhat';
 import { HardhatUserConfig } from 'hardhat/types';
-import * as fs from 'fs';
-import '@nomiclabs/hardhat-etherscan';
 
-const mnemonicFileName =
-  process.env.MNEMONIC_FILE ??
-  `${process.env.HOME}/.secret/testnet-mnemonic.txt`;
+import '@nomiclabs/hardhat-etherscan';
+import dotenv from 'dotenv';
+dotenv.config();
+
 let mnemonic = 'test '.repeat(11) + 'junk';
-if (fs.existsSync(mnemonicFileName)) {
-  mnemonic = fs.readFileSync(mnemonicFileName, 'ascii');
+if (process.env.MNEMONIC) {
+  mnemonic = process.env.MNEMONIC;
 }
 
 function getNetwork1(url: string): {
@@ -42,6 +41,7 @@ const config: HardhatUserConfig = {
   },
   networks: {
     goerli: getNetwork('goerli'),
+    mumbai: getNetwork('polygon-mumbai'),
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,

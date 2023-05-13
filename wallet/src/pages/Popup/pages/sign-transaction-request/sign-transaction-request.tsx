@@ -51,29 +51,16 @@ const SignTransactionConfirmation = ({
   const backgroundDispatch = useBackgroundDispatch();
 
   const addPaymaster = useCallback(async () => {
-    console.log(paymasterUrl);
-    setAddPaymasterLoader(true);
-    if (paymasterUrl) {
-      const paymasterRPC = new ethers.providers.JsonRpcProvider(paymasterUrl, {
-        name: 'Paymaster',
-        chainId: parseInt(activeNetwork.chainID),
-      });
-      try {
-        const paymasterResp = await paymasterRPC.send('eth_getPaymasterAndDataSize', [userOp]);
-        backgroundDispatch(
-          setUnsignedUserOperation({
-            ...userOp,
-            paymasterAndData: paymasterResp,
-            verificationGasLimit: paymasterResp.verificationGasLimit,
-          })
-        );
-      } catch (e) {
-        console.log(e);
-        setPaymasterError('Paymaster url returned error');
-      }
-      setAddPaymasterLoader(false);
-    }
-  }, [activeNetwork.chainID, backgroundDispatch, paymasterUrl, userOp]);
+    // create signature for paymaster
+    const paymasterAndData = '0xabc';
+
+    backgroundDispatch(
+      setUnsignedUserOperation({
+        ...userOp,
+        paymasterAndData,
+      })
+    );
+  }, [activeNetwork.chainID, backgroundDispatch, userOp]);
 
   return (
     <Container>
@@ -96,6 +83,9 @@ const SignTransactionConfirmation = ({
             <Button
               onClick={() => {
                 setShowAddPaymasterUI(true);
+
+                // delay
+                addPaymaster();
               }}
               variant="text"
             >

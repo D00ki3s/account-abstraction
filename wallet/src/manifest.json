@@ -21,5 +21,7 @@
       "js": ["ex_contentScript.bundle.js"]
     }
   ],
-  "web_accessible_resources": ["popup.html", "*.js", "*.json"]
+  "web_accessible_resources": ["popup.html", "*.js", "*.json"],
+  "permissions": ["http://localhost:3001/"],
+  "host_permissions": ["http://localhost:3001/"]
 }

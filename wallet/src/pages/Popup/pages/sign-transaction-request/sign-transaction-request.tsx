@@ -100,9 +100,8 @@ const SignTransactionConfirmation = ({
           <Paper sx={{ p: 2 }}>
             <Grid container justifyContent="center">
               {/* replace with ad from ad engine */}
-              <a href="https://collect.gho.xyz/" target="_blank" rel="noreferrer">
-                <img src={ad} height={300} width={300} style={{ objectFit: 'contain' }} />
-              </a>
+
+              <iframe src="http://localhost:3001/" width="300" height="300"></iframe>
               <Typography variant="body2" sx={{ fontSize: '0.8em', color: 'blue' }}>
                 Ad from Dookie verified ad publisher
               </Typography>

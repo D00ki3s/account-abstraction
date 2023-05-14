@@ -34,7 +34,7 @@ export default {
     name: 'Polygon Mumbai',
     provider: 'https://polygon-mumbai.infura.io/v3/eedaad734dce46a4b08816a7f6df0b9b',
     entryPointAddress: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
-    bundler: 'https://api.stackup.sh/v1/node/bdaf63d7cd0180897fc9ec780edd1d408e4c406aaab1763a73b21b0b35ae4af9',
+    bundler: 'http://localhost:3002/rpc',
     baseAsset: {
       symbol: 'MATIC',
       name: 'MATIC',

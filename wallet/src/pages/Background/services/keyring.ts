@@ -379,6 +379,12 @@ export default class KeyringService extends BaseService<Events> {
       ? estimatePreVerificationGas.toHexString()
       : userOp.preVerificationGas;
 
+    // temp hard code
+    // const preVerificationGas = '0xf4240'; // 1000000
+    // const callGasLimit = '0xf4240'; // 1000000
+    // userOp.preVerificationGas = preVerificationGas;
+    // userOp.callGasLimit = callGasLimit;
+
     return userOp;
   };
 

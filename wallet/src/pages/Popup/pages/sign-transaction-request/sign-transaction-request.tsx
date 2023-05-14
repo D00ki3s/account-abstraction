@@ -59,7 +59,7 @@ const SignTransactionConfirmation = ({
   const callCreateUserOpWithDookies = useCallback(async () => {
     setLoading(true);
     backgroundDispatch(createUserOpWithDookies(activeAccount));
-    await wait(5000);
+    await wait(10000);
     setLoading(false);
   }, [backgroundDispatch, activeAccount]);
 
@@ -156,7 +156,7 @@ const SignTransactionConfirmation = ({
             onClick={() => onSend()}
             disabled={showAddPaymasterUI && loading}
           >
-            {loading ? <CircularProgress size={20} /> : 'Send'}
+            {loading ? <CircularProgress size={24} /> : 'Send'}
           </Button>
         </Box>
       </Paper>

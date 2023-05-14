@@ -43,3 +43,5 @@ This is a working tx reference on Polygon Mumbai.
 https://mumbai.polygonscan.com/tx/0x99d182888112e32c196513816774975818617234ba5843599158303a14df652e#eventlog
 
 ![tx](./docs/tx.png)
+
+https://twitter.com/ookimaki_dev/status/1657690951458979842?s=20
